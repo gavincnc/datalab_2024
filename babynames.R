@@ -44,7 +44,5 @@ write.csv(the_nineties, "datalab_2024.rproj")
 ggplot(data = bb_names %>% filter(name %in% c("Gavin", "Kyle", "Joseph"), year == 2005), aes(x = name, y = n)) +
   geom_col(fill = "darkolivegreen")
 #20) Make a visual that looks at your name over time. What happens if you color by sex?
-ggplot(data = bb_names %>% filter(name == "Gavin", sex == "M"), aes(x = year, y = n)) +
+ggplot(data = bb_names %>% filter(name == "Gavin"), aes(x = year, y = n, col = sex)) +
   geom_line(fill = "darkblue", size = 1.2)
-                   
-                   
