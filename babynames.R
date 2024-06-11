@@ -30,7 +30,7 @@ the_nineties <- bb_names %>%
 
 
 # 16) Save this dataset to your repository (use write.csv()).
-write.csv(the_nineties, "/Users/gavinclark/Desktop/gavin_datalab/datalab_2024/datalab_2024.rproj")
+write.csv(the_nineties, "datalab_2024.rproj")
 # 17) Add, commit, and push your files to GitHub.
 
                    
