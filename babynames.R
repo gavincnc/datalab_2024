@@ -37,7 +37,7 @@ the_nineties <- bb_names %>%
   filter(year >= 1990, year <= 1999)
 
 # 16) Save this dataset to your repository (use write.csv()).
-write.csv(the_nineties, "datalab_2024.rproj")
+
 # 17) Add, commit, and push your files to GitHub.
 
 #19) Now that everything is up to date, make a visualisation of you and your team member’s names for a year of your choice.
