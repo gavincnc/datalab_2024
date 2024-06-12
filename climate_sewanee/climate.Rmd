@@ -1,0 +1,97 @@
+---
+title: "climate report"
+author: "Gavin Clark"
+date: "2024-06-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+library(tidyverse)
+library(sf)
+library(tmap)
+library(rnaturalearth)
+library(rnaturalearthhires)
+library(rnaturalearthdata)
+sewanee_weather<-read_csv('sewanee_weather.csv')
+```
+# Introduction
+Here are what we will be covering:
+- Minimum and Maximum Temperature over time.
+- What month has the most snowfall on average?
+- Effect of temperature in precipitation.
+## Effect of Temperature in Precipitation
+```{r}
+sewanee_weather<-sewanee_weather %>%
+  mutate(avg_t=(TMAX+TMIN)/2) %>%
+  mutate(year = as.integer(format(DATE, "%Y")))
+ggplot(data=sewanee_weather %>%  filter(year>=2010 & year<=2020), aes(x=avg_t, y= PRCP))+
+  geom_line(aes(color = factor(year)))
+  labs(title='Relation between Temperature and Precipitation from 2010 to 2020',
+       color='YEAR',
+       x='AVG TEMPERATURE',
+       y='PRECIPITATION')+
+    theme_minimal()
+```
+## Effect of Temperature in Precipitation
+```{r}
+sewanee_weather<-sewanee_weather %>%
+  mutate(avg_t=(TMAX+TMIN)/2) %>%
+  mutate(year = year(DATE))
+ggplot(data=sewanee_weather %>%  filter(year>=2010 & year<=2020), aes(x=avg_t, y= PRCP))+
+  geom_line(aes(color = year))
+  labs(title='Relation between Temperature and Precipitation from 2010 to 2020',
+       color='YEAR',
+       x='AVG TEMPERATURE',
+       y='PRECIPITATION')+
+    theme_minimal()
+```
+## Average Precipitation for each month over five year periods
+```{r echo=FALSE, message=FALSE}
+updated<- sewanee_weather %>%
+  filter(year>=2000 & year<=2025) %>%
+  mutate(year = year(DATE),
+         month = month(DATE)) %>%
+  mutate(period = cut(year, breaks = seq(2000, 2025, by = 5))) %>%
+  group_by(period, month) %>%
+  summarize(mean_prcp = mean(PRCP, na.rm = TRUE))
+updated<-na.omit(updated)
+ggplot(data=updated, aes(x=month, y=mean_prcp, col=month))+
+  geom_line()+
+  facet_wrap(~period)
+```
+## Average Temperature over the years
+```{r echo=FALSE, message=FALSE}
+sewanee<-read_csv('sewanee_weather.csv')
+sewanee <- sewanee %>%
+  mutate(year = year(DATE))
+#pull average temperature of all time
+avg_temp<-sewanee %>%
+  summarise(avg_temp = mean(((TMIN + TMAX)/2), na.rm = TRUE))
+#pull average temperatures by year
+avg_temp_by_year <- sewanee %>%
+  group_by(year) %>%
+  summarise(avg_temp_by_year = mean(((TMIN + TMAX)/2), na.rm = TRUE)) %>%
+  mutate(avg_temp_by_year)
+#line graph for average temperature by year!
+ggplot(data = avg_temp_by_year, aes(x = year, y = avg_temp_by_year)) +
+  geom_point(alpha = 0.2) +
+  geom_line() +
+  labs(x = 'Time (Year)',
+       y = 'Average Temperature',
+       title = 'Average Temperature Over Time')
+twenty_twenty_four <- sewanee %>%
+  filter(year == 2024)
+#only data from january-beginning of april 2024, so temps will be much lower on avg so far!
+#scale from 0-65 degrees
+ggplot(data = avg_temp_by_year, aes(x = year, y = avg_temp_by_year)) +
+  geom_point(alpha = 0.2) +
+  geom_line() +
+  coord_cartesian(ylim = c(0, 65)) +
+  labs(x = 'Time (Year)',
+       y = 'Average Temperature',
+       title = 'Average Temperature Over Time')
+```
+
+
+
