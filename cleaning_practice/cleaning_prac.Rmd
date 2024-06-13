@@ -1,0 +1,50 @@
+---
+title: "cleaning_prac"
+author: "Gavin Clark"
+date: "2024-06-13"
+output: html_document
+---
+
+```{r echo = TRUE, message = FALSE}
+library(tidyverse)
+library(sf)
+library(tmap)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(rnaturalearthhires)
+library(stringr)
+whales_clean <- read_csv('whales_clean.csv')
+whales <- read_csv("whales_unclean.csv")
+
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, show_col_types = FALSE)
+
+
+```
+
+```{r}
+new_whales <- whales %>% 
+  mutate(Month = paste0("0", Month)) %>%
+  mutate(YEAR = ifelse(YEAR == 15, paste0("2015"), paste0("2014"))) %>%
+  mutate(id = paste0(YEAR,Month, Day)) %>%
+  mutate(sit = substr(sit, 10, 12)) %>%
+  mutate(id = paste0(id, sit)) %>%
+  mutate(id = as.factor(id)) %>%
+  drop_na()
+```
+
+
+```{r}
+new_whales <- new_whales %>% 
+  select(id, Species.ID, bhvr, PreyVolume, PreyDepth, Dive_Time, Surfacetime, Blow.Interval, Blow_number_count)
+
+names(new_whales) <- c("id", "species","behavior","prey.volume","prey.depth","dive.time","surface.time","blow.interval","blow.number")
+
+
+new_whales <- new_whales %>% 
+  distinct(id, .keep_all = TRUE) %>%
+  mutate(species = ifelse(species %in% c("fin", "finderbender", "FinW", "FinWhale", "FW"), paste0("FW"), paste0("HW"))) %>%
+  mutate(behavior = ifelse(behavior %in% c("FE", "FEED"), paste0("FEED"), paste0("OTHER"))) 
+```
+
+
+
