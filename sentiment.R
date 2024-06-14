@@ -65,23 +65,40 @@ wordcloud2(word_freq, size = 2, minSize = 0, gridSize =  1,
            rotateRatio = 0.4, shape = 'pentagon', ellipticity = 0.65)
 # 18. Make an object with the top 10 words used only. Name this object top10.
 top10 <- word_freq %>%
-  filter(n >= 4) %>%
-  arrange(rank(desc(n)) <= 10) %>%
+  arrange(desc(n)) %>%
+  head(10)
   
 
 
   
 # 19. Create a bar chart showing the number of times the top10 words were used.
-ggplot(data = top10, aes(x = n)) +
-  geom_bar()
+ggplot(data = top10, aes(x = word, y = n)) +
+  geom_col()
 # 20. Run the below to join word_freq with sentiments.
-# 
+total <- left_join(word_freq, sentiments, by = "word")
+
+full_total <- left_join(total, words, by = "word")
 # 21. Now explore the data. What is going on?
-#   
+   
 #   22. For the whole survey, were there more negative or positive sentiment words used?
-#   
+positive_count <- full_total %>%
+  filter(sentiment == "positive") %>%
+  group_by(first_name) %>%
+  summarise(positive_count = n())
+
+negative_count <- full_total %>%
+  filter(sentiment == "negative") %>%
+  group_by(first_name) %>%
+  summarise(negative_count = n())
 #   23. Create an object with the number of negative and positive words used for each person.
-# 
+sentiment_counts <- full_total %>%
+  group_by(first_name) %>%
+  summarise(total_word = n()) %>%
+  left_join(positive_count, by = "first_name") %>%
+  left_join(negative_count, by = "first_name") %>%
+  replace_na(list(positive_count = 0, negative_count = 0))
+  
+  
 # 24. In that object, create a new variabled named sentimentality, which is the number of positive words minus the number of negative words.
 # 
 # 25. Make a histogram of senitmentality
